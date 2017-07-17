@@ -1,0 +1,18 @@
+package uk.ac.cam.bravo.CrowdControl.simulator.forUI;
+
+import java.util.List;
+
+public class FurniturePoly {
+	public final int edgeColour;
+	public final int fillColour;
+	public final List<Vertex> vertices;
+	
+	public FurniturePoly(int edgeColour, int fillColour, List<Vertex> vertices) {
+		super();
+		this.edgeColour = edgeColour;
+		this.fillColour = fillColour;
+		this.vertices = vertices;
+	}
+	
+	
+}

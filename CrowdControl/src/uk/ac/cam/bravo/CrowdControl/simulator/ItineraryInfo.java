@@ -1,0 +1,63 @@
+package uk.ac.cam.bravo.CrowdControl.simulator;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import uk.ac.cam.bravo.CrowdControl.agent.AgentInterface;
+import uk.ac.cam.bravo.CrowdControl.simulator.AgentManager.AgentLocation;
+
+public class ItineraryInfo implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	private final List<Itinerary> itineraries;
+	private final List<AgentManager.AgentLocation> startPositions;
+	private final int nAgents;
+	
+	private Map<Itinerary, List<AgentInterface>> itinToAgents;
+	
+	public ItineraryInfo(List<Itinerary> itineraries, List<AgentLocation> startPositions, int nAgents) {
+		
+		if (startPositions.size() != nAgents) {
+			System.out.println("<Simulator> Need as many start positions as there are agents!");
+		}
+		
+		this.itineraries = itineraries;
+		this.startPositions = startPositions;
+		this.nAgents = nAgents;
+		this.itinToAgents = new HashMap<Itinerary, List<AgentInterface>>(); 
+		
+		for (Itinerary i : itineraries) {
+			itinToAgents.put(i, new ArrayList<AgentInterface>(nAgents));
+		}
+		
+	}
+	
+	public int getNumItineraries() {
+		return itineraries.size();
+	}
+
+	public int getNumAgents() {
+		return nAgents;
+	}
+
+	public List<Itinerary> getItineraries() {
+		return itineraries;
+	}
+
+	public List<AgentManager.AgentLocation> getStartPositions() {
+		return startPositions;
+	}
+	
+	public List<AgentInterface> getAgentsForItinerary(Itinerary i) {
+		return itinToAgents.get(i);
+	}
+	
+	public void addAgentToItinerary(Itinerary itin, AgentInterface a) {
+		itinToAgents.get(itin).add(a);
+	}
+	
+}

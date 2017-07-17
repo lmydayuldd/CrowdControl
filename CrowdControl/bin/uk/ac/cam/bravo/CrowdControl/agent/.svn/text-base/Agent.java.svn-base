@@ -1,0 +1,68 @@
+package uk.ac.cam.bravo.CrowdControl.agent;
+
+import java.awt.geom.Point2D;
+import java.util.*;
+import uk.ac.cam.bravo.CrowdControl.simulator.forAgent.*;
+
+public class Agent implements AgentInterface {
+	private Point2D.Float position;
+	private RoomInterface room;
+	private List<ItineraryItemInterface> itinerary;
+	private Health health;
+
+	public Agent(RoomInterface room, Point2D.Float position, ArrayList<ItineraryItemInterface> itinerary) {
+		this.room = room;
+		this.position = position;
+		this.itinerary = itinerary;
+	}
+	
+	public Point2D.Float GetPosition() {
+		return position;
+	}
+
+	public RoomInterface GetRoom() {
+		return room;
+	}
+
+	public List<ItineraryItemInterface> GetItinerary() {
+		return itinerary;
+	}
+
+	public void SetItinerary(List<ItineraryItemInterface> newItinerary) {
+		itinerary = newItinerary;
+	}
+
+	public void Act() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void SetEmergency() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public Point2D.Float GetLastMovement() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public float GetAverageSpeed() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void ResetAverageSpeed() {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public int timeTakenForItinerary() {
+		// TODO Manually-generated method stub
+		return 0;
+	}
+
+	public Health GetHealth() {
+		return health;
+	}
+}

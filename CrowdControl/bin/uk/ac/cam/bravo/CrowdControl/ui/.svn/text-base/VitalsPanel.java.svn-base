@@ -1,0 +1,95 @@
+package uk.ac.cam.bravo.CrowdControl.ui;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+
+public class VitalsPanel extends Panel {
+	private static final int DETAIL_LABEL_HEIGHT = 50;
+	private static final int DETAIL_HEIGHT = 32;
+	private static final GridData LABEL_GRID_DATA = new GridData(SWT.FILL, SWT.CENTER, true, false);
+	
+	private final Label currentTime, currentPopulation;
+	private final Button evacuate;
+	
+	private Label createLabel(String text, GridData layoutData, boolean separator) {
+		Label label = new Label(panel, (separator) ? SWT.SEPARATOR | SWT.HORIZONTAL : SWT.NONE); 
+		label.setLayoutData(layoutData);
+		label.setAlignment(SWT.CENTER);
+		label.setText(text);
+		return label;
+	}
+	
+	public VitalsPanel(Composite parent, int style, String title, Display d) {
+		super(parent, style, title, d);
+		
+		createLabel(UIS.CURRENT_TIME, LABEL_GRID_DATA, false);
+		
+		GridData detailGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		detailGridData.heightHint = DETAIL_LABEL_HEIGHT;
+		
+		currentTime = createLabel("", detailGridData, false);
+		currentTime.setForeground(display.getSystemColor(SWT.COLOR_RED));
+		
+		FontData[] fD = currentTime.getFont().getFontData();
+		for (FontData f : fD) {
+			f.setHeight(DETAIL_HEIGHT);
+			f.setStyle(SWT.BOLD);
+		}
+		final Font detailFont = new Font(display, fD);
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				detailFont.dispose();
+			}
+		});
+		
+		currentTime.setFont(detailFont);
+		currentTime.setBounds(0,0,500, 500);
+		
+		createLabel("", LABEL_GRID_DATA, true);
+		
+		createLabel(UIS.CURRENT_POPULATION, LABEL_GRID_DATA, false);
+		
+		currentPopulation = createLabel("", detailGridData, false);
+		currentPopulation.setForeground(display.getSystemColor(SWT.COLOR_RED));
+		currentPopulation.setFont(detailFont);
+		currentPopulation.setSize(currentPopulation.getSize().x, DETAIL_LABEL_HEIGHT);
+		
+		evacuate = new Button(panel, SWT.PUSH);
+		GridData evacuateGridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		evacuateGridData.heightHint = DETAIL_LABEL_HEIGHT;
+		evacuate.setLayoutData(evacuateGridData);
+		evacuate.setBackground(display.getSystemColor(SWT.COLOR_RED));
+		evacuate.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		evacuate.setFont(detailFont);
+	}
+
+	public void setTime(String s) {
+		currentTime.setText(s);
+	}
+	
+	public void setPopulation(String s) {
+		currentPopulation.setText(s);
+	}
+	
+	public void setEvacuateText(String s) {
+		evacuate.setText(s);
+	}
+	
+	public void removeEvacuateListener(int eventType, Listener handler) {
+		evacuate.removeListener(eventType, handler);
+	}
+
+	public void addEvacuateListener(int eventType, Listener handler) {
+		evacuate.addListener(eventType, handler);
+	}
+}

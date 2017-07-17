@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<MapRequestResponse>
+    <Map>
+        <Map25D level="0" name="Ground" version="1.0">
+            <Room accesslevel="0" name="A" uid="1">
+                <Poly uid="100">
+                    <Vertex edgetype="wall" x="100" y="100" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="100" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="275" y="125" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="225" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="225" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="175" y="200" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="175" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="150" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="150" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="125" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="100" y="150" z="0"/>
+                </Poly>
+            </Room>
+            <Room accesslevel="0" name="B" uid="2">
+                <Poly uid="101">
+                    <Vertex edgetype="wall" x="100" y="150" z="0"/>
+                    <Vertex edgetype="connector" target="100" x="125" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="150" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="150" z="0"/>
+                    <Vertex edgetype="connector" target="100" x="175" y="175" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="200" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="225" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="225" z="0"/>
+                    <Vertex edgetype="connector" target="100" x="275" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="125" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="100" z="0"/>
+                    <Vertex edgetype="connector" target="110" x="300" y="100" z="0"/>
+                    <Vertex edgetype="wall" x="325" y="100" z="0"/>
+                    <Vertex edgetype="wall" x="375" y="100" z="0"/>  
+                    <Vertex edgetype="connector" target="102" x="375" y="125" z="0"/>
+                    <Vertex edgetype="wall" x="375" y="150" z="0"/>
+                    <Vertex edgetype="connector" target="104" x="375" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="350" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="103" x="275" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="250" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="103" x="175" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="150" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="100" y="275" z="0"/>
+                </Poly>
+            </Room>
+            <Room accesslevel="0" name="C" uid="3">
+                <Poly uid="102">
+                    <Vertex edgetype="wall" x="375" y="100" z="0"/>
+                    <Vertex edgetype="wall" x="500" y="100" z="0"/>
+                    <Vertex edgetype="wall" x="500" y="200" z="0"/>
+                    <Vertex edgetype="wall" x="375" y="200" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="375" y="150" z="0"/>
+                    <Vertex edgetype="wall" x="375" y="125" z="0"/>
+                </Poly>
+            </Room>
+            <Room accesslevel="0" name="D" uid="4">
+                <Poly uid="103">
+                    <Vertex edgetype="wall" x="100" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="150" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="175" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="250" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="300" y="325" z="0"/>
+                    <Vertex edgetype="connector" target="106" x="275" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="250" y="325" z="0"/>
+                    <Vertex edgetype="connector" target="105" x="150" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="125" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="100" y="325" z="0"/>  
+                </Poly>
+            </Room>
+            <Room accesslevel="0" name="E" uid="5">
+                <Poly uid="104">
+                    <Vertex edgetype="wall" x="300" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="101" x="350" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="375" y="275" z="0"/>
+                    <Vertex edgetype="wall" x="425" y="275" z="0"/>
+                    <Vertex edgetype="connector" target="110" x="425" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="425" y="350" z="0"/>
+                    <Vertex edgetype="wall" x="425" y="375" z="0"/>
+                    <Vertex edgetype="connector" target="106" x="300" y="375" z="0"/>  
+                    <Vertex edgetype="wall" x="300" y="350" z="0"/>
+                </Poly>
+            </Room>         
+            <Room accesslevel="0" name="F" uid="6">
+                <Poly uid="105">
+                    <Vertex edgetype="wall" x="100" y="325" z="0"/>
+                    <Vertex edgetype="connector" target="103" x="125" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="150" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="200" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="200" y="375" z="0"/>
+                    <Vertex edgetype="connector" target="110" x="150" y="375" z="0"/>
+                    <Vertex edgetype="wall" x="125" y="375" z="0"/>
+                    <Vertex edgetype="wall" x="100" y="375" z="0"/>
+                </Poly>
+            </Room>
+            <Room accesslevel="0" name="G" uid="7">
+                <Poly uid="106">
+                    <Vertex edgetype="wall" x="200" y="325" z="0"/>
+                    <Vertex edgetype="connector" target="103" x="250" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="275" y="325" z="0"/>
+                    <Vertex edgetype="wall" x="300" y="325" z="0"/>
+                    <Vertex edgetype="connector" target="104" x="300" y="350" z="0"/>
+                    <Vertex edgetype="wall" x="300" y="375" z="0"/>
+                    <Vertex edgetype="wall" x="300" y="425" z="0"/>
+                    <Vertex edgetype="wall" x="200" y="425" z="0"/>
+                </Poly>
+            </Room>
+        </Map25D>
+    </Map>
+</MapRequestResponse>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

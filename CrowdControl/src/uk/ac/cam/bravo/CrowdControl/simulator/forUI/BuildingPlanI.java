@@ -1,0 +1,53 @@
+package uk.ac.cam.bravo.CrowdControl.simulator.forUI;
+
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
+public interface BuildingPlanI extends Serializable {
+	
+	/**
+	 * Returns the number of floors in this building plan.
+	 * 
+	 * @return the number of floors.
+	 */
+	public int getFloors();
+	
+	/**
+	 * Returns a list of the room shapes on the specified floor.
+	 * 
+	 * @param floor the floor number.
+	 * @return a list of room shapes.
+	 */
+	public List<RoomShape> getRooms(int floor);
+	
+	/**
+	 * Returns a list of the furniture shapes that can appear in the building plan.
+	 * 
+	 * @return a list of furniture shapes.
+	 */
+	public List<FurnitureShape> getFurnitureShapes();
+	
+	/**
+	 * Returns a list of the furniture located on the specified floor.
+	 * 
+	 * @param floor the floor number.
+	 * @return a list of furniture on the given floor.
+	 */
+	public List<Furniture> getFurnitureLocations(int floor);
+	
+	/**
+	 * Returns a mapping from floor numbers to floor names.
+	 *  
+	 * @return a map from floor numbers to floor names
+	 */
+	public Map<Integer, String> getFloorNames();
+	
+	/**
+	 * Returns the smallest bounding rectangle that encloses the whole building plan (without the outside room).
+	 * 
+	 * @return the smallest rectangle bounding the building
+	 */
+	public Rectangle2D.Float getBoundingBox();
+}

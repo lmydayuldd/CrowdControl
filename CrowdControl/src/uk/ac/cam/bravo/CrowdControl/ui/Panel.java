@@ -1,0 +1,28 @@
+package uk.ac.cam.bravo.CrowdControl.ui;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+
+public class Panel extends Composite {
+	
+	protected final Display display;
+	protected final Group panel;
+	
+	protected Panel(Composite parent, int style, String title, Display d) {
+		super(parent, style);
+		
+		display = d;
+		
+		setLayout(new FillLayout());
+		
+		panel = new Group(this, SWT.SHADOW_ETCHED_IN);
+	    panel.setText(title);
+	    panel.setLayout(new GridLayout());
+	}
+	
+	public void clear() {}
+}

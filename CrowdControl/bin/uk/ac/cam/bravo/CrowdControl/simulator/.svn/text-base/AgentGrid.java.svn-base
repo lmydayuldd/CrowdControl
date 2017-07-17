@@ -1,0 +1,220 @@
+package uk.ac.cam.bravo.CrowdControl.simulator;
+
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D.Float;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+
+import uk.ac.cam.bravo.CrowdControl.agent.Agent;
+import uk.ac.cam.bravo.CrowdControl.agent.AgentInterface;
+import uk.ac.cam.bravo.CrowdControl.agent.SimpleAgent;
+import uk.ac.cam.bravo.CrowdControl.simulator.forAgent.RoomInterface;
+
+class AgentGrid {
+	 
+	public class AgentList {
+		public List<AgentInterface> agents = new LinkedList<AgentInterface>();
+		public int col;
+		public int row;
+		
+		AgentList(int col, int row) {
+			this.col = col;
+			this.row = row;
+		}
+	}
+
+	private static final int BUCKET_SIZE = 1000;
+	private final AgentList[][] buckets;
+	private final int width;
+	private final int height;
+	private final Rectangle2D.Float boundingBox;
+	
+	private boolean testing = false;
+	
+	public void setTesting(boolean t) {
+		testing = t;
+	}
+	
+	public AgentGrid(Iterable<AgentInterface> agents, Rectangle2D.Float boundingBox) {
+		
+		this.width = (int) boundingBox.width / BUCKET_SIZE;
+		this.height = (int) boundingBox.height / BUCKET_SIZE;
+		this.boundingBox = boundingBox;
+		this.buckets = new AgentList[width][height];
+		
+		System.out.println("<AgentGrid> w=" + width + " h=" + height);
+		
+		for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
+				buckets[i][j] = new AgentList(i, j);
+			}
+		}
+		
+		//initialise grid
+		for (AgentInterface a: agents)
+			addAgent(a);	
+		
+		/*for (int i = 0; i < width; ++i) {
+			for (int j = 0; j < height; ++j) {
+				System.out.println("Agents in bucket " + i + " " + j);
+				for (AgentInterface a: buckets[i][j].agents)
+					System.out.println(normalizePoint(a.GetPosition()));
+			}
+		}*/
+	}
+
+	public List<AgentInterface> findAgentsNear(Point2D.Float position, float radius, 
+																		Map<AgentInterface, AgentManager.AgentLocation> prevPos,
+																		boolean useCurrAgentPos) {
+		
+		//Coordinates of square bounding the circle (position, radius).
+
+		float X1 = position.x - radius;		
+		float Y1 = position.y - radius;
+		float X2 = position.x + radius;
+		float Y2 = position.y + radius;
+		
+		float minX = boundingBox.x;
+		float minY = boundingBox.y - boundingBox.height;
+		float maxX = boundingBox.x + boundingBox.width;
+		float maxY = boundingBox.y;
+		
+		if (X1 < minX)
+			X1 = minX;
+		if (Y1 < minY)
+			Y1 = minY;
+		if (X2 >= maxX)
+			X2 = maxX - 1;
+		if (Y2 >= maxY)
+			Y2 = maxY - 1;
+
+		Point2D.Float p1 = normalizePoint( new Point2D.Float(X1, Y1));
+		Point2D.Float p2 = normalizePoint( new Point2D.Float(X2, Y2));
+
+		//buckets of upper left and bottom right corners of square
+		AgentList upLeft = getNode(p1);
+		AgentList bottomRight = getNode(p2);
+
+		List<AgentInterface> agents = new LinkedList<AgentInterface>();
+		
+		for(int i = upLeft.col; i <= bottomRight.col; ++i) 
+			for (int j = upLeft.row; j <= bottomRight.row; ++j) 
+				agents.addAll(buckets[i][j].agents);
+		
+		double sqrR = Math.pow(radius, 2);
+		Iterator<AgentInterface> it = agents.iterator();
+		
+		//filter out the points that aren't actually in the circle and if there is one, 
+		//the point at position 
+		while (it.hasNext()) {
+			AgentInterface a = it.next();
+			Point2D.Float p;
+			
+			if (!useCurrAgentPos)
+				p = prevPos.get(a).coord;
+			else
+				p = a.GetPosition();
+
+			if (p.equals(position)) {
+				it.remove();
+				continue;
+			}
+			
+			double d =  (Math.pow((p.x - position.x), 2) + Math.pow((p.y - position.y), 2));
+			
+			//Not within radius of position
+			if (d > sqrR) 
+				it.remove();	
+		}
+		
+		return agents;
+	}
+	
+	public AgentList getNode(Point2D.Float p) {
+		
+		int col  = (int) p.x / BUCKET_SIZE;
+		int row = (int) p.y / BUCKET_SIZE;
+
+		//need the extra condition on the p.x and p.y for world widths that aren't divisible by bucketSize. 
+		//In that case, the buckets col = width - 1 are actually larger than the bucketSize and contain all 
+		//points such that p.x in [bucketSize * width, worldWidth] and p.y in [bucketSize * height, worldHeight]
+		if (col >= width && p.x < boundingBox.width) 
+			col = width - 1;				  
+											  
+		if (row >= height && p.y < boundingBox.height)
+			row = height - 1;
+		
+		return buckets[col][row];
+
+	}
+
+	private void addAgent(AgentInterface a) {
+		try {
+			AgentList n = getNode( normalizePoint(a.GetPosition()));
+			n.agents.add(a);
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("Not adding agent at position " + a.GetPosition() + ": out of bounds!");		
+		}
+	}
+	
+	private Point2D.Float normalizePoint(Point2D.Float p) {
+		Point2D.Float normp = new Point2D.Float();
+		normp.x = p.x - boundingBox.x;
+		normp.y = p.y - (boundingBox.y - boundingBox.height);
+		return normp;
+	}
+	
+	public void moveAgent(Point2D.Float prevPos, AgentInterface a) {
+		AgentList n = getNode( normalizePoint(prevPos));
+		n.agents.remove(a);
+		addAgent(a);
+	}
+	
+	
+	/*public static void main(String args[]) {
+		List<AgentInterface> agents = new LinkedList<AgentInterface>();
+
+		float w = 54.3f;
+		float h = 41.6f;
+		for (int i = 5; i < w; i+= 10) {
+			for (int j = 5; j < h; j+= 10) {
+				agents.add( new Agent(null, new Point2D.Float(i, j), null));
+			}
+		}
+		
+		int k = 50;
+		
+		for (int j = 5; j < h; j+= 10) {
+			agents.add( new Agent(null, new Point2D.Float(k, j), null));
+		}
+		
+		
+		
+		AgentGrid grid = new AgentGrid(agents, w, h, 10);
+		grid.setTesting(true);
+		
+		List<AgentInterface> near = new LinkedList<AgentInterface>();
+
+		for (int radius = 5; radius < 60; radius += 5) {
+			for (int i = 0; i < w; i+= 5) {
+				for (int j = 0; j < h; j+= 5) {
+					Point2D.Float p = new Point2D.Float(i, j);
+					near = grid.findAgentsNear(p, radius, null);
+					
+					System.out.println("agents within " + radius + " of " + p);
+									
+					for (AgentInterface a : near)
+						System.out.println(a.GetPosition());
+					
+				}
+			}
+		}
+		
+	}*/
+}
+

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Itineraries>
+    <Itinerary nagents="2" uid="0">
+        <Room uid="1" time="300"/>
+        <Room uid="7" time="600"/>
+        <Room uid="5" time="600"/>
+        <Room uid="3" time="300"/>
+    </Itinerary>
+    <StartPositions>
+		<Position uid="2" x="325" y="150"/>
+		<Position uid="6" x="150" y="350"/>
+	</StartPositions>
+</Itineraries>

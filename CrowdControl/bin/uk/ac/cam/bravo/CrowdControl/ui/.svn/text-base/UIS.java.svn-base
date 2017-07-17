@@ -1,0 +1,32 @@
+package uk.ac.cam.bravo.CrowdControl.ui;
+
+public class UIS {
+	public static final String SHELL_TITLE = "Crowd Control";
+	public static final String MAP = "Building Map";
+	
+	public static final String MENU_FILE_TITLE = "&File";
+	public static final String MENU_FILE_LOADSIMCONFIG = "&Load Simulation Configuration";
+	public static final String MENU_FILE_EXIT = "&Exit";
+	public static final String MENU_FILE_CLEAR = "&Clear";
+	
+	public static final String MENU_SIM_TITLE = "&Simulator";
+	public static final String MENU_SIM_RUN = "&Run";
+	public static final String MENU_SIM_STOP = "&Stop";	
+	
+	public static final String VITALS_TITLE = "Information";
+	public static final String CURRENT_TIME = "Current Time";
+	public static final String CURRENT_POPULATION = "Current Population";
+	public static final String EVACUATE = "Evacuate";
+	
+	public static final String DIALOG_OK = "&OK";
+	public static final String DIALOG_TITLE = "Error";
+	public static final String DIALOG_TEXT = "Unable to load jar file.";
+	
+	public static final String LOG = "Log";
+	
+	public static final String CONTROLS = "Simulation Controls";
+	
+	public static final String USAGE = "Usage: CrowdControl <Building File> <Furniture Definitions> <Furniture Locations File> <Itinerary File>";
+	
+	public static final String FLOOR = "Floor: ";
+}

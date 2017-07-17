@@ -1,0 +1,117 @@
+/*
+* The Simulator class runs the simulation and interacts with the UI.
+* Has an instance of the AgentManager class, an instance of the Building
+* class and an instance of the Statistics class. 
+*/
+
+package uk.ac.cam.bravo.CrowdControl.simulator;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+
+import uk.ac.cam.bravo.CrowdControl.agent.AgentInterface;
+import uk.ac.cam.bravo.CrowdControl.simulator.forUI.BuildingPlanI;
+import uk.ac.cam.bravo.CrowdControl.simulator.forUI.SimulatorInterface;
+import uk.ac.cam.bravo.CrowdControl.simulator.forUI.StatisticsInterface;
+
+public class Simulator implements SimulatorInterface {
+	
+	private Building building;
+	private AgentManager agentManager;
+	private Statistics stats;
+	
+	private int clock;
+	private final int timeStep = 1; //TODO decide on time step
+	private boolean isEmergency;
+	
+	/* the InputStreams should be in the following order:
+	*  Room data, Furniture Shapes, Furniture locations, Itineraries
+	*/
+	public Simulator(List<InputStream> iss) throws ParserConfigurationException, SAXException, IOException, MissingConfigFilesException {
+		
+		this.building = new Building(iss);
+		System.out.println("outside bounding box " + building.getOutside().getBoundingBox());
+		if (iss.size() < 4) {
+			throw new MissingConfigFilesException(4, iss.size());
+		}
+		
+		XMLItineraryParser p = new XMLItineraryParser(iss.get(3));
+		
+		ItineraryInfo agentInfo  = p.generateItineraries(building.getRooms());
+		p.close();
+
+		this.agentManager = new AgentManager(this, building, agentInfo);
+		this.stats = new Statistics(agentManager, agentInfo, timeStep, building.getNumDoors());
+		
+		this.clock = 0;
+		this.isEmergency = false;
+	}
+	
+	public Simulator(ItineraryInfo info) {
+		
+	}
+    
+    @Override
+    public List<AgentInterface> doSimulationStep() {
+    	
+    	agentManager.updateAgents(timeStep, isEmergency);
+    	clock += timeStep;
+    	Set<AgentInterface> agents = agentManager.getWorldState();
+    	stats.updateSimulationStats(clock, agents, building.getDoors());    	
+    	List<AgentInterface> world = new ArrayList<AgentInterface>(agents);
+    	
+    	if (agents.size() == 0 && isEmergency)
+    		isEmergency = false;
+    	
+    	return world;
+    }
+  
+
+    public void stopSimulation() {
+    	clock = 0;
+    	//TODO clear agentManager
+    }
+
+    public void replaySimulation(String filename) {
+    	
+    }
+
+    public void setSimulationMode(boolean isEmergency) {
+    	this.isEmergency = isEmergency;
+    	
+    	if (isEmergency)
+    		stats.signalStartEvac(clock);
+    	else
+    		stats.signalEndEvac(clock);
+    }
+
+
+    public BuildingPlanI getBuildingPlan() {
+    	
+    	return building.getBuildingPlan();
+    }
+
+    public List<AgentInterface> getWorldState() {
+    	
+    	return new ArrayList<AgentInterface>(agentManager.getWorldState());
+    }
+
+    public StatisticsInterface getStatistics() {  	
+    	return stats;
+    }
+
+	@Override
+	public int getTimestamp() {
+		return clock;
+	}
+    
+}

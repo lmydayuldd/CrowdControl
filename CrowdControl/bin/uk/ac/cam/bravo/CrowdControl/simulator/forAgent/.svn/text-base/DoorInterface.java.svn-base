@@ -1,0 +1,13 @@
+package uk.ac.cam.bravo.CrowdControl.simulator.forAgent;
+
+import java.awt.geom.Line2D;
+
+import uk.ac.cam.bravo.CrowdControl.agent.AgentInterface;
+
+public interface DoorInterface {
+	
+	public Line2D.Float getRoomCoord(RoomInterface r);
+
+    public RoomInterface getDestination(RoomInterface r);
+
+}

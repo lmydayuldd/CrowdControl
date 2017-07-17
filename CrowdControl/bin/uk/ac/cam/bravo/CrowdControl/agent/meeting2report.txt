@@ -1,0 +1,5 @@
+The agent team has written SimpleAgent, and agent that implements route finding between rooms but not within them. Inside rooms, it simply moves in a straight line at a constant speed, ignoring collisions with other agents or impassable regions. This is to allow the simulation and UI teams to test their code, as it will be hard to finish and test the final agent without those parts in a working condition.
+
+We have also started working on ParticleAgent, the agent that will be used in the final product. This is based on each agent being modelled as a particle, with forces that push it away from walls, furniture and other agents and towards the target door. 
+
+We are planning to unit test some of the simpler functions of SimpleAgent and ParticleAgent, but it will not be possible to unit test the overall behaviour of the agents. This is because the behaviour is not well-defined, and to do so we would have to duplicate a lot of the simulation and UI teams work in our test code.

@@ -1,0 +1,51 @@
+package uk.ac.cam.bravo.CrowdControl.ui;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+
+public class Dialog {
+	
+	private static final int OK_BUTTON_WIDTH = 80;
+	
+	public Dialog(Shell shell, String title, String text) {
+		final Shell dialog = new Shell (shell, SWT.DIALOG_TRIM);
+		dialog.setText(title);
+		
+		dialog.setLayout(new GridLayout(2, false));	
+		dialog.setSize(500, 120);
+		
+		Label label = new Label (dialog, SWT.NONE);
+		label.setText (text);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		Button okButton = new Button (dialog, SWT.PUSH);
+		okButton.setText (UIS.DIALOG_OK);
+		GridData okButtonGridData = new GridData(SWT.CENTER, SWT.FILL, false, false);
+		okButtonGridData.widthHint = OK_BUTTON_WIDTH;
+		okButton.setLayoutData(okButtonGridData);
+		
+		okButton.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dialog.dispose();			
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+			
+		});
+		
+		dialog.setDefaultButton(okButton);
+		dialog.pack ();
+		dialog.open ();
+	}
+}

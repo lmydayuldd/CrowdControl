@@ -1,0 +1,147 @@
+package uk.ac.cam.bravo.CrowdControl.ui;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scale;
+
+public class ControlsPanel  extends Panel{
+	public static final int BUTTON_BEGIN = 0;
+	public static final int BUTTON_REWIND = 1;
+	public static final int BUTTON_PLAYPAUSE = 2;
+	public static final int BUTTON_FASTFORWARD = 3;
+	public static final int BUTTON_END = 4;
+	
+	//TODO: put in real button images
+	private static final String PLAY_LABEL = ">";
+	private static final String PAUSE_LABEL = "||";
+	private static final String[] BUTTON_LABELS = new String[] {"|<", "<<", PLAY_LABEL, ">>", ">|"};
+	
+	public final int BUTTONS = BUTTON_LABELS.length;
+	
+	private final Composite controls;
+	private final Composite progressComposite;
+	private final Label medprogress, maxprogress;
+	private final Scale progress;
+	private final List<Button> buttons = new ArrayList<Button>(BUTTON_LABELS.length);
+	
+	private boolean paused = true;
+	
+	private int relayoutInterval = 10;
+	
+	public ControlsPanel(Composite parent, int style, String title, Display d) {
+		super(parent, style, title, d);
+		
+	    controls = new Composite(panel, SWT.NONE);
+	    controls.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	    FillLayout controlsFillLayout = new FillLayout();
+	    controlsFillLayout.type = SWT.VERTICAL;
+	    controls.setLayout(controlsFillLayout);
+		
+	    progressComposite = new Composite(controls, SWT.NONE);
+	    progressComposite.setLayout(new FormLayout());
+	    
+	    Label minprogress = new Label(progressComposite, SWT.NONE);
+	    minprogress.setText("0");
+	    
+	    medprogress = new Label(progressComposite, SWT.NONE);
+	    medprogress.setAlignment(SWT.CENTER);
+	    medprogress.setText("0");
+	    
+	    maxprogress = new Label(progressComposite, SWT.NONE);
+	    maxprogress.setText("0");
+	    maxprogress.setAlignment(SWT.RIGHT);
+	    
+	    progress = new Scale(progressComposite, SWT.NONE);
+	    progress.setMaximum(0);
+	    
+	    FormData minData = new FormData();
+	    minData.left = new FormAttachment(0, 11);
+	    
+	    FormData maxData = new FormData();
+	    maxData.right = new FormAttachment(100, -11);
+	    maxData.left = new FormAttachment(80, 0);
+	    
+	    FormData medData = new FormData();
+	    medData.left = new FormAttachment(40, 0);
+	    medData.right = new FormAttachment(60, 0);
+	    
+	    FormData progressData = new FormData();
+	    progressData.top = new FormAttachment(medprogress,1);
+	    progressData.left = new FormAttachment(0, 0);
+	    progressData.right = new FormAttachment(100, 0);
+	    progressData.bottom = new FormAttachment(100, 0);
+	    
+	    minprogress.setLayoutData(minData);
+	    medprogress.setLayoutData(medData);
+	    maxprogress.setLayoutData(maxData);
+	    progress.setLayoutData(progressData);
+	    
+		Composite buttonsComposite = new Composite(controls, SWT.NONE);
+		buttonsComposite.setLayout(new FillLayout());
+		for (String label : BUTTON_LABELS) {
+			Button b = new Button(buttonsComposite, SWT.NONE);
+			b.setText(label);
+			buttons.add(b);
+		}
+	}
+	
+	public void updateProgress(int max, int pos) {
+		progress.setMaximum(max);
+		maxprogress.setText(String.valueOf(max));
+		medprogress.setText(String.valueOf(max / 2));
+		progress.setSelection(pos);
+	}
+	
+	public int getProgress() {
+		return progress.getSelection();
+	}
+	
+	public int maximiseProgress() {
+		int p = progress.getMaximum();
+		progress.setSelection(p);
+		return p;
+	}
+	
+	public int minimiseProgress() {
+		int p = progress.getMinimum();
+		progress.setSelection(p);
+		return p;
+	}
+	
+	public void addProgressListener(int eventType, Listener listener) {
+		progress.addListener(eventType, listener);
+	}
+	
+	public void removeProgressListener(int eventType, Listener listener) {
+		progress.removeListener(eventType, listener);
+	}
+	
+	public void addButtonListener(int button, int eventType, Listener listener) throws IndexOutOfBoundsException {
+		buttons.get(button).addListener(eventType, listener);
+	}
+	
+	public void removeBarListener(int button, int eventType, Listener listener) throws IndexOutOfBoundsException {
+		buttons.get(button).removeListener(eventType, listener);
+	}
+	
+	public Button getButton(int id) {
+		return buttons.get(id);
+	}
+	
+	public void togglePlayPauseButton() {
+		buttons.get(BUTTON_PLAYPAUSE).setText((paused) ? PAUSE_LABEL : PLAY_LABEL);
+		paused = !paused;
+	}
+}

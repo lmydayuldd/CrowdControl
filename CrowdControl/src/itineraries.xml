@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Itineraries>
+    <Itinerary nagents="1" uid="0">
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="297" time="30"/>
+        <Room uid="69" time="20"/>
+	   <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="297" time="30"/>
+
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="297" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="78" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+        <Room uid="231" time="45"/>
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="239" time="40"/>
+        <Room uid="78" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+        <Room uid="231" time="45"/>
+        <Room uid="297" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="78" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="231" time="45"/>
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="297" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="78" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="231" time="45"/>
+        <Room uid="228" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="78" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="231" time="45"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="228" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="78" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="231" time="45"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="231" time="45"/>
+        <Room uid="297" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="69" time="20"/>
+        <Room uid="78" time="30"/>
+        <Room uid="228" time="20"/>
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="239" time="40"/>
+        <Room uid="231" time="45"/>
+        <Room uid="297" time="30"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="69" time="20"/>
+        <Room uid="78" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="228" time="20"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+        <Room uid="231" time="45"/>
+        <Room uid="239" time="40"/>
+        <Room uid="78" time="30"/>
+        <Room uid="247" time="30"/>
+    </Itinerary>
+	<Itinerary nagents="1" uid="0">
+        <Room uid="228" time="20"/>
+        <Room uid="69" time="20"/>
+        <Room uid="297" time="30"/>
+        <Room uid="231" time="45"/>
+        <Room uid="239" time="40"/>
+        <Room uid="78" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+    </Itinerary>
+    <StartPositions>
+		<Position uid="69" x="950" y="1050"/>
+		<Position uid="69" x="957" y="1050"/>
+		<Position uid="69" x="950" y="1048"/>
+		<Position uid="69" x="955" y="1048"/>
+		<Position uid="69" x="1000" y="1050"/>
+		<Position uid="69" x="945" y="1052"/>
+		<Position uid="69" x="960" y="1053"/>
+	</StartPositions>
+</Itineraries>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Itineraries>
+       <Itinerary nagents="150" uid="2">
+	   <Room uid="226" time="30"/>
+        <Room uid="297" time="30"/>
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="247" time="30"/>
+	   <Room uid="247" time="30"/>
+        <Room uid="228" time="20"/>
+        <Room uid="231" time="45"/>
+        <Room uid="78" time="30"/>
+        <Room uid="239" time="40"/>
+        <Room uid="69" time="20"/>
+        <Room uid="228" time="20"/>
+	   <Room uid="226" time="30"/>
+        <Room uid="297" time="30"/>
+        <Room uid="69" time="20"/>
+    </Itinerary>
+    <StartPositions>
+      <StartRoom uid="62" nagents="100" />
+	<StartRoom uid="73" nagents="50" />
+    </StartPositions>
+</Itineraries>

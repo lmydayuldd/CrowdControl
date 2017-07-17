@@ -1,0 +1,367 @@
+package uk.ac.cam.bravo.CrowdControl.agent;
+
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
+import uk.ac.cam.bravo.CrowdControl.simulator.forAgent.*;
+
+public class ParticleAgent implements AgentInterface {
+	// The agent manager.
+	private AgentManagerInterface agentManager;
+	// Sequence of goal rooms and wait times, not including the very next one.
+	private List<ItineraryItemInterface> itinerary;
+	// Current and desired room.
+	private RoomWrapper room;
+	private RoomWrapper desiredRoom;
+	// Time to wait when in desired room.
+	private int waitTime;
+	// Current and desired position within room.
+	private Vector2D position;
+	private Vector2D desiredPosition;
+	// Door to pass through.
+	private DoorInterface nextDoor;
+	// The agent's normal and emergency walking speed.
+	private static float normalSpeed = 10f, emergencySpeed = normalSpeed * 2f;
+	// The speed up to which the agent gets impatient and tries random movements.
+	private static float slowSpeed = normalSpeed * 0.5f;
+	// The force with which an agent moves.
+	private static float walkForce = normalSpeed * 0.5f;
+	// The force with which an agent avoids obstacles.
+	private static float obstacleForce = walkForce * 2f;
+	// The 'drag' factor of an agent's movement.
+	private static float dragFactor = 0.25f;
+	// Pressures to cause injury and death.
+	//private static float injuryPressure = 10, deathPressure = 20;
+	private static float injuryPressure = Float.POSITIVE_INFINITY, deathPressure = Float.POSITIVE_INFINITY;
+	// The agent's current walking speed.
+	private float desiredSpeed;
+	// Current net 'force' and 'pressure' on agent.
+	private Vector2D force;
+	private float pressure;
+	// Agent's health state.
+	private Health health;
+	// Change in position in last tick.
+	private Vector2D velocity;
+	// Cumulative distance and time since last call to ResetAverageSpeed.
+	private float moveDistance;
+	private int moveTime;
+	private int itineraryTime;
+	// Distance at which obstacles and agents are reacted to.
+	private static float obstacleDistance = 10f;
+
+	public ParticleAgent(AgentManagerInterface agentManager, RoomInterface room, Point2D.Float position, List<ItineraryItemInterface> itinerary) {
+		this.agentManager = agentManager;
+		this.itinerary = itinerary;
+		this.desiredRoom = this.room = new RoomWrapper(room);
+		this.waitTime = 0;
+		this.position = new Vector2D(position);
+		this.desiredPosition = new Vector2D(position);
+		this.nextDoor = null;
+		this.desiredSpeed = normalSpeed;
+		this.force = new Vector2D(0, 0);
+		this.pressure = 0;
+		this.health = Health.Healthy;
+		this.velocity = new Vector2D(0, 0);
+		this.moveDistance = 0;
+		this.moveTime = 0;
+		this.itineraryTime = 0;
+	}
+
+	public Point2D.Float GetPosition() {
+		return new Vector2D(position);
+	}
+
+	public RoomInterface GetRoom() {
+		return room.getRoom();
+	}
+
+	public List<ItineraryItemInterface> GetItinerary() {
+		boolean haveItinerary = (itinerary != null && !itinerary.isEmpty());
+		boolean addCurrent = (!desiredRoom.isNull() && !desiredRoom.equals(room)) || waitTime > 0;
+		int size = addCurrent ? 1 : 0;
+		if(haveItinerary)
+			size += itinerary.size();
+		ArrayList<ItineraryItemInterface> result = new ArrayList<ItineraryItemInterface>(size);
+		if(addCurrent)
+			result.add(new ItineraryItem((desiredRoom.isNull() ? room : desiredRoom).getRoom(), waitTime));
+		if(haveItinerary)
+			result.addAll(itinerary);
+		return result;
+	}
+
+	public void SetItinerary(List<ItineraryItemInterface> newItinerary) {
+		itinerary = new LinkedList<ItineraryItemInterface>(newItinerary);
+		itineraryTime = 0;
+		desiredRoom = room;
+		waitTime = 0;
+		desiredPosition = null;
+		nextDoor = null;
+	}
+
+	public void Act() {
+		UpdateGoals();
+		UpdateForces();
+		UpdateHealth();
+		if(health == Health.Healthy)
+			DoMove();
+		UpdateStatistics();
+	}
+
+	public void SetEmergency() {
+		itinerary = null;
+		itineraryTime = 0;
+		desiredRoom = new RoomWrapper(agentManager.getOutside());
+		waitTime = 0;
+		desiredPosition = position;
+		nextDoor = null;
+		desiredSpeed = emergencySpeed;
+	}
+
+	public Point2D.Float GetLastMovement() {
+		return new Vector2D(velocity);
+	}
+
+	public float GetAverageSpeed() {
+		if(moveTime == 0)
+			return 0;
+		return moveDistance / moveTime;
+	}
+
+	public void ResetAverageSpeed() {
+		moveDistance = moveTime = 0;
+		// Do not reset itineraryTime here.
+	}
+	
+	public int timeTakenForItinerary() {
+		return itineraryTime;
+	}
+	
+	public void UpdateStatistics() {
+		boolean targettingRoom = (!desiredRoom.isNull() && !desiredRoom.equals(room));
+		boolean hasItinerary = (itinerary != null && !itinerary.isEmpty());
+		if(targettingRoom) {
+			++moveTime;
+			moveDistance += velocity.Length();
+		}
+		if(targettingRoom || hasItinerary)
+			++itineraryTime;
+	}
+
+	public Health GetHealth() {
+		return health;
+	}
+	
+	protected boolean IsPurposeful() {
+		return !room.equals(desiredRoom);
+	}
+
+	protected void SetRoom(RoomInterface room) {
+		RoomInterface oldRoom = this.room.getRoom();
+		if(room != oldRoom) {
+			this.room = new RoomWrapper(room);
+			agentManager.updateCurrentRoom(this, oldRoom, room);
+		}
+	}
+
+	protected void SetDesiredPosition(Vector2D pos) {
+		desiredPosition = pos;
+	}
+
+	protected void UpdateHealth() {
+		if(health != Health.Dead) {
+			if(pressure >= deathPressure)
+				health = Health.Dead;
+			else if(pressure >= injuryPressure)
+				health = Health.Injured;
+		}
+	}
+
+	protected float GetSquareDistance(int x, int y) {
+		if(desiredPosition == null)
+			return 0;
+		return room.getGoalDistance(x, y, room.posToGridX(desiredPosition.x), room.posToGridY(desiredPosition.y));
+	}
+
+	protected void DoMove() {
+		// Save old velocity and determine new velocity.
+		Vector2D oldVelocity = velocity;
+		velocity = oldVelocity.Scale(1 - dragFactor).Add(force);
+		// Stop idle movement if we are oscillating.
+		if(!IsPurposeful() && velocity.x * oldVelocity.x + velocity.y * oldVelocity.y < 0)
+			desiredPosition = null;
+		// Store old position and compute new position.
+		Vector2D oldPosition = position;
+		position = oldPosition.Add(velocity);
+		// Handle waiting and changing rooms.
+		if(room.equals(desiredRoom) && waitTime > 0) {
+			--waitTime;
+		} else if(nextDoor != null) {
+			Line2D.Float doorLine = nextDoor.getRoomCoord(room.getRoom());
+			if(doorLine.intersectsLine(oldPosition.x, oldPosition.y, position.x, position.y)) {
+				RoomInterface newRoom = nextDoor.getDestination(room.getRoom());
+				// TODO: Transform position into new room coordinates.
+				// For now we assume the coordinates are the same, which is true within each floor.
+				SetRoom(newRoom);
+				nextDoor = null;
+				SetDesiredPosition(null);
+			}
+		}
+		// Avoid walking into obstacles.
+		final int startX = room.posToGridX(oldPosition.x);
+		final int startY = room.posToGridY(oldPosition.y);
+		Vector2D origVelocity = velocity;
+		while(true) {
+			final int curX = room.posToGridX(position.x);
+			final int curY = room.posToGridY(position.y);
+			if(room.isSquarePassable(curX, curY))
+				break;
+			if(curX == startX && curY == startY) {
+				velocity = origVelocity;
+				position = oldPosition.Add(velocity);
+				break;
+			}
+			// Stop idle movement if we are encountering an obstacle.
+			if(!IsPurposeful())
+				desiredPosition = null;
+			velocity = velocity.Scale(0.5f);
+			position = oldPosition.Add(velocity);
+		}
+	}
+
+	protected void UpdateGoals() {
+		Vector2D newDesiredPosition = desiredPosition;
+		if(room.equals(desiredRoom)) {
+			nextDoor = null;
+			if(waitTime <= 0 && itinerary != null && !itinerary.isEmpty()) {
+				ItineraryItemInterface item = itinerary.remove(0);
+				desiredRoom = new RoomWrapper(item.GetRoom());
+				waitTime = item.GetWaitTime();
+			}
+		}
+		if(nextDoor == null && !room.equals(desiredRoom)) {
+			List<DoorInterface> suggestedDoors = agentManager.getHighLevelPath(room.getRoom(), desiredRoom.getRoom());
+			if(suggestedDoors != null && !suggestedDoors.isEmpty())
+				nextDoor = suggestedDoors.get(0);
+		}
+		if(nextDoor != null) {
+			newDesiredPosition = GetLineMidpoint(nextDoor.getRoomCoord(room.getRoom()));
+		} else if(newDesiredPosition == null) {
+			Rectangle2D.Float boundingBox = room.getBoundingBox();
+			newDesiredPosition = new Vector2D(
+				(float) (boundingBox.x + Math.random() * boundingBox.width),
+				(float) (boundingBox.y + Math.random() * boundingBox.height)
+			);
+		}
+		SetDesiredPosition(newDesiredPosition);
+	}
+
+	protected void UpdateForces() {
+		ArrayList<Vector2D> forceList = new ArrayList<Vector2D>();
+		GetGoalForce(forceList);
+		//GetWallForce(forceList);
+		GetAgentForce(forceList);
+		force = new Vector2D();
+		pressure = 0;
+		for(Vector2D partForce : forceList) {
+			if(Float.isInfinite(partForce.x) || Float.isNaN(partForce.x) || Float.isInfinite(partForce.y) || Float.isNaN(partForce.y))
+				continue;
+			force = force.Add(partForce);
+			pressure += partForce.Length();
+		}
+	}
+/*	// Subsumed into GetGoalForce.
+	protected void GetWallForce(List<Vector2D> forceList) {
+		if(room.isNull())
+			return;
+		int xMin = room.posToGridX(position.x - obstacleDistance);
+		int xMax = room.posToGridX(position.x + obstacleDistance);
+		int yMin = room.posToGridY(position.y - obstacleDistance);
+		int yMax = room.posToGridY(position.y + obstacleDistance);
+		for(int x = xMin; x <= xMax; ++x) {
+			for(int y = yMin; y <= yMax; ++y) {
+				if(!room.isSquarePassable(x, y)) {
+					Vector2D offset = new Vector2D(
+						position.x - obstacleDistance + (x - xMin) * 2 * obstacleDistance / (xMax - xMin),
+						position.y - obstacleDistance + (y - yMin) * 2 * obstacleDistance / (yMax - yMin));
+					float len = offset.Length();
+					if(!offset.IsZero() && len <= obstacleDistance)
+						forceList.add(offset.Normalise().Scale(obstacleForce / (float) Math.sqrt(len + 1)));
+				}
+			}
+		}
+	}
+*/
+	protected boolean AddGoalMoveDirection(Vector2D result, int moveX, int moveY, int baseX, int baseY) {
+		float pref = 1 / GetSquareDistance(baseX + moveX, baseY + moveY);
+		if(pref == Float.POSITIVE_INFINITY)
+			return true;
+		if(!Float.isInfinite(pref) && !Float.isNaN(pref)) {
+			result.x += moveX * pref;
+			result.y += moveY * pref;
+		}
+		return false;
+	}
+	protected void AddObstacleMoveDirection(Vector2D result, int moveX, int moveY, int baseX, int baseY) {
+		float pref = -1 / room.getObstacleDistance(baseX + moveX, baseY + moveY);
+		if(pref == Float.NEGATIVE_INFINITY)
+			pref = -1;
+		if(!Float.isInfinite(pref) && !Float.isNaN(pref)) {
+			result.x += moveX * pref;
+			result.y += moveY * pref;
+		}
+	}
+	protected void GetGoalForce(List<Vector2D> forceList) {
+		Vector2D goalV = new Vector2D();
+		if(desiredPosition != null && velocity.Length() > slowSpeed) {
+			int squareX = room.posToGridX(position.x);
+			int squareY = room.posToGridY(position.y);
+			boolean goalInVicinity = 
+				AddGoalMoveDirection(goalV, -1, -1, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, -1, 0, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, -1, 1, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 0, -1, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 0, 0, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 0, 1, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 1, -1, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 1, 0, squareX, squareY) ||
+				AddGoalMoveDirection(goalV, 1, 1, squareX, squareY);
+			if(goalInVicinity || goalV.IsZero()) {
+				goalV = desiredPosition.Subtract(position);
+			} else {
+				Vector2D obstacleV = new Vector2D();
+				AddObstacleMoveDirection(obstacleV, -1, -1, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, -1, 0, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, -1, 1, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 0, -1, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 0, 0, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 0, 1, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 1, -1, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 1, 0, squareX, squareY);
+				AddObstacleMoveDirection(obstacleV, 1, 1, squareX, squareY);
+				goalV = goalV.Normalise().Add(obstacleV.Normalise().Scale(0.5f));
+			}
+		} else {
+			goalV = new Vector2D((float) Math.random() - 0.5f, (float) Math.random() - 0.5f);
+		}
+
+		goalV = goalV.Normalise().Scale(desiredSpeed);
+		Vector2D force = goalV.Subtract(velocity.Scale(1 - dragFactor));
+		if(force.Length() > walkForce)
+			force = force.Normalise().Scale(walkForce);
+		forceList.add(force);
+	}
+	protected void GetAgentForce(List<Vector2D> forceList) {
+		for(AgentInterface agent: agentManager.getAgentsNear(room.getRoom(), position, obstacleDistance)) {
+			Vector2D offset = new Vector2D(agent.GetPosition()).Subtract(position);
+			float len = offset.Length();
+			if(!offset.IsZero() && len <= obstacleDistance)
+				forceList.add(offset.Normalise().Scale(obstacleForce / (len + 1)));
+		}
+	}
+
+	protected Vector2D GetLineMidpoint(Line2D.Float line) {
+		return new Vector2D((line.x1 + line.x2) / 2, (line.y1 + line.y2) / 2);
+	}
+}
+
